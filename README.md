@@ -62,7 +62,3 @@ Discord may install a new `app-1.0.*` folder. Run **`discordfix.bat`** again (as
 | `discordfix.bat` | Finds latest Discord app folder, downloads and copies DLL + INI |
 | `version.dll` | Native hook loaded via Windows DLL search order next to Discord |
 | `config.ini` | Runtime settings |
-
-## License / safety
-
-Inspect binaries before running them in elevated context. Prefer building or auditing `version.dll` yourself if you need full transparency. This project is provided as-is.
