@@ -1,0 +1,6 @@
+# OS / editor
+Thumbs.db
+Desktop.ini
+
+# Temp deploy folders
+discord-ram-deploy-*
