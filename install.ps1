@@ -5,14 +5,14 @@
 
 .DESCRIPTION
     Finds the newest %LOCALAPPDATA%\Discord\app-1.0.* folder, optionally stops
-    Discord, then copies the hook DLL and settings INI. By default uses files
-    from this script's directory; pass -Download to fetch from GitHub instead.
-
-.PARAMETER Local
-    Copy version.dll and config.ini from the script directory (default).
+    Discord, then downloads version.dll and config.ini from GitHub and copies
+    them into that folder. Pass -Local to use files next to the script instead.
 
 .PARAMETER Download
-    Download files from the GitHub raw URLs instead of using local copies.
+    Download files from the GitHub raw URLs (default).
+
+.PARAMETER Local
+    Copy version.dll and config.ini from the script directory instead of downloading.
 
 .PARAMETER NoKill
     Do not attempt to terminate Discord before copying files.
@@ -22,19 +22,19 @@
 
 .EXAMPLE
     .\install.ps1
-    Deploy using local files next to the script.
+    Download the latest published DLL and INI from GitHub, then deploy.
 
 .EXAMPLE
-    .\install.ps1 -Download
-    Download the latest published DLL and INI from GitHub, then deploy.
+    .\install.ps1 -Local
+    Deploy using local files next to the script.
 #>
-[CmdletBinding(DefaultParameterSetName = 'Local')]
+[CmdletBinding(DefaultParameterSetName = 'Download')]
 param(
-    [Parameter(ParameterSetName = 'Local')]
-    [switch] $Local,
-
     [Parameter(ParameterSetName = 'Download')]
     [switch] $Download,
+
+    [Parameter(ParameterSetName = 'Local')]
+    [switch] $Local,
 
     [switch] $NoKill,
 
@@ -101,8 +101,8 @@ function Request-Admin {
         '-NoProfile', '-ExecutionPolicy', 'Bypass',
         '-File', "`"$PSCommandPath`""
     )
-    if ($Download) { $args += '-Download' }
-    if ($NoKill)   { $args += '-NoKill' }
+    if ($Local)  { $args += '-Local' }
+    if ($NoKill) { $args += '-NoKill' }
     if ($DiscordBase -ne "$env:LOCALAPPDATA\Discord") {
         $args += '-DiscordBase', "`"$DiscordBase`""
     }
@@ -254,7 +254,7 @@ try {
     Write-Dim "Version: $($target.Version)"
     Write-Host ''
 
-    $sources = Get-SourceFiles -UseDownload $Download.IsPresent
+    $sources = Get-SourceFiles -UseDownload (-not $Local.IsPresent)
     $tempDir = $sources.TempDir
 
     if (-not $NoKill) {

@@ -28,16 +28,16 @@ All behavior is driven by **`config.ini`** in the same folder as the DLL.
 2. Right-click **`install.bat`** → **Run as administrator**.
 3. Start Discord.
 
-The installer copies `version.dll` and `config.ini` from the repo folder into your latest `%LOCALAPPDATA%\Discord\app-1.0.*` directory.
+The installer finds your latest `%LOCALAPPDATA%\Discord\app-1.0.*` folder, downloads `version.dll` and `config.ini` from this repository, and copies them in.
 
 **Option B — PowerShell**
 
 ```powershell
-# Deploy local files (default)
+# Download from GitHub and deploy (default)
 .\install.ps1
 
-# Download latest from GitHub instead of using local copies
-.\install.ps1 -Download
+# Use local files next to the script instead
+.\install.ps1 -Local
 
 # Skip killing Discord (copy only if files are not locked)
 .\install.ps1 -NoKill
@@ -74,7 +74,7 @@ Discord installs a new `app-1.0.*` folder. Run **`install.bat`** again (as admin
 
 | File | Role |
 |------|------|
-| `install.ps1` | Main installer (local or `-Download`) |
+| `install.ps1` | Main installer (downloads from repo; optional `-Local`) |
 | `install.bat` | Double-click launcher |
 | `discordfix.bat` | Legacy alias for `install.bat` |
 | `version.dll` | Native hook loaded via DLL search order |
