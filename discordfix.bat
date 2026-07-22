@@ -180,7 +180,7 @@ set "URL=%~1"
 set "OUT=%~2"
 set "LABEL=%~3"
 
-echo %C_INFO%[^>]%C_RESET% %LABEL%
+echo %C_INFO%[*]%C_RESET% %LABEL%
 echo   %C_DIM%%URL%%C_RESET%
 
 set "CURL_EXE=%SystemRoot%\System32\curl.exe"
