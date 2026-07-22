@@ -18,32 +18,16 @@ All behavior is driven by **`config.ini`** in the same folder as the DLL.
 ## Requirements
 
 - Windows 10/11 with the Discord desktop client
-- Administrator rights for installation (to replace files and stop Discord if needed)
+- Administrator rights for installation
+- `curl.exe` in System32 (included with Windows 10/11)
 
 ## Quick install
 
-**Option A — double-click (easiest)**
-
-1. Download or clone this repo.
-2. Right-click **`install.bat`** → **Run as administrator**.
+1. Download **`install.bat`** (or **`discordfix.bat`**) from this repo — that one file is enough.
+2. Right-click it → **Run as administrator**.
 3. Start Discord.
 
-The installer finds your latest `%LOCALAPPDATA%\Discord\app-1.0.*` folder, downloads `version.dll` and `config.ini` from this repository, and copies them in.
-
-**Option B — PowerShell**
-
-```powershell
-# Download from GitHub and deploy (default)
-.\install.ps1
-
-# Use local files next to the script instead
-.\install.ps1 -Local
-
-# Skip killing Discord (copy only if files are not locked)
-.\install.ps1 -NoKill
-```
-
-`discordfix.bat` is kept as a legacy alias for `install.bat`.
+The script finds your latest `%LOCALAPPDATA%\Discord\app-1.0.*` folder, downloads `version.dll` and `config.ini` from GitHub, and copies them in.
 
 ## Manual install
 
@@ -68,14 +52,14 @@ Edit `config.ini` in the Discord app folder, then restart Discord.
 
 ## After a Discord update
 
-Discord installs a new `app-1.0.*` folder. Run **`install.bat`** again (as admin) or copy the two files manually into the new folder.
+Discord installs a new `app-1.0.*` folder. Run the `.bat` again (as admin) or copy the two files manually into the new folder.
 
 ## Repository layout
 
 | File | Role |
 |------|------|
-| `install.ps1` | Main installer (downloads from repo; optional `-Local`) |
-| `install.bat` | Double-click launcher |
-| `discordfix.bat` | Legacy alias for `install.bat` |
+| `install.bat` | Standalone installer — download this alone and run as admin |
+| `discordfix.bat` | Same installer (alternate name) |
 | `version.dll` | Native hook loaded via DLL search order |
-| `config.ini` | Default settings (copied on install) |
+| `config.ini` | Default settings (downloaded on install) |
+| `install.ps1` | Optional PowerShell version of the installer |
