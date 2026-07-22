@@ -180,7 +180,7 @@ set "URL=%~1"
 set "OUT=%~2"
 set "LABEL=%~3"
 
-echo %C_INFO%[>]%C_RESET% %LABEL%
+echo %C_INFO%[^>]%C_RESET% %LABEL%
 echo   %C_DIM%%URL%%C_RESET%
 
 set "CURL_EXE=%SystemRoot%\System32\curl.exe"
@@ -200,9 +200,11 @@ if not exist "%OUT%" (
   exit /b 1
 )
 
-for %%F in ("%OUT%") do if %%~zF LSS 1 (
-  echo %C_ERR%[x]%C_RESET% Downloaded file is empty.
-  exit /b 1
+for %%F in ("%OUT%") do (
+  if %%~zF LSS 1 (
+    echo %C_ERR%[x]%C_RESET% Downloaded file is empty.
+    exit /b 1
+  )
 )
 
 echo %C_OK%[+]%C_RESET% Downloaded.
