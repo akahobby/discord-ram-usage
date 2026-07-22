@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableExtensions EnableDelayedExpansion
-chcp 65001 >nul
+chcp 65001 >nul 2>&1
 
 :: =========================================================
 :: AUTO ELEVATE
@@ -29,29 +29,18 @@ set "INI_URL=https://raw.githubusercontent.com/akahobby/discord-ram-usage/main/c
 
 set "LOCKING_PROCESS=Discord.exe"
 
-:: =========================================================
-:: UI
-:: =========================================================
-for /f "delims=" %%A in ('echo prompt $E^| cmd') do set "ESC=%%A"
-set "C_RESET=%ESC%[0m"
-set "C_OK=%ESC%[92m"
-set "C_WARN=%ESC%[93m"
-set "C_ERR=%ESC%[91m"
-set "C_INFO=%ESC%[96m"
-set "C_DIM=%ESC%[90m"
-
 cls
-echo %C_INFO%==============================================%C_RESET%
-echo %C_INFO%           Discord RAM Fix Installer         %C_RESET%
-echo %C_INFO%==============================================%C_RESET%
+echo ==============================================
+echo            Discord RAM Fix Installer
+echo ==============================================
 echo.
 
 :: =========================================================
 :: Validate base folder
 :: =========================================================
 if not exist "%BASE_DIR%\" (
-  echo %C_ERR%[x]%C_RESET% Discord folder not found:
-  echo   %C_DIM%%BASE_DIR%%C_RESET%
+  echo [x] Discord folder not found:
+  echo     %BASE_DIR%
   set "EXITCODE=1"
   goto :END
 )
@@ -73,15 +62,15 @@ for /d %%D in ("%BASE_DIR%\%FOLDER_GLOB%") do (
 )
 
 if not defined TARGET_DIR (
-  echo %C_ERR%[x]%C_RESET% No folder matching "%FOLDER_GLOB%" found in:
-  echo   %C_DIM%%BASE_DIR%%C_RESET%
+  echo [x] No folder matching "%FOLDER_GLOB%" found in:
+  echo     %BASE_DIR%
   set "EXITCODE=1"
   goto :END
 )
 
-echo %C_OK%[+]%C_RESET% Target Discord folder:
-echo   %C_DIM%%TARGET_DIR%%C_RESET%
-echo %C_DIM%Version:%C_RESET% %BEST_VER%
+echo [+] Target Discord folder:
+echo     !TARGET_DIR!
+echo     Version: !BEST_VER!
 echo.
 
 :: =========================================================
@@ -90,7 +79,7 @@ echo.
 set "TEMP_DIR=%TEMP%\discord_ram_deploy_%RANDOM%%RANDOM%"
 mkdir "%TEMP_DIR%" >nul 2>&1
 if errorlevel 1 (
-  echo %C_ERR%[x]%C_RESET% Failed to create temp folder.
+  echo [x] Failed to create temp folder.
   set "EXITCODE=1"
   goto :END
 )
@@ -101,7 +90,7 @@ set "INI_PATH=%TEMP_DIR%\%INI_NAME%"
 :: =========================================================
 :: Download from GitHub
 :: =========================================================
-echo %C_INFO%[*]%C_RESET% Downloading files from GitHub...
+echo [*] Downloading files from GitHub...
 echo.
 
 call :Download "%DLL_URL%" "%DLL_PATH%" "DLL"
@@ -113,13 +102,13 @@ if errorlevel 1 ( set "EXITCODE=1" & goto :END )
 :: =========================================================
 :: Close Discord if running
 :: =========================================================
-echo %C_INFO%[*]%C_RESET% Checking for "%LOCKING_PROCESS%"...
+echo [*] Checking for "%LOCKING_PROCESS%"...
 
 tasklist /fi "imagename eq %LOCKING_PROCESS%" 2>nul | find /i "%LOCKING_PROCESS%" >nul
 if errorlevel 1 (
-    echo %C_OK%[+]%C_RESET% Discord is not running.
+    echo [+] Discord is not running.
 ) else (
-    echo %C_WARN%[!]%C_RESET% Discord detected. Terminating...
+    echo [!] Discord detected. Terminating...
     taskkill /f /im "%LOCKING_PROCESS%" >nul 2>&1
 
     set "WAITCOUNT=0"
@@ -133,9 +122,9 @@ if errorlevel 1 (
 
     tasklist /fi "imagename eq %LOCKING_PROCESS%" 2>nul | find /i "%LOCKING_PROCESS%" >nul
     if errorlevel 1 (
-        echo %C_OK%[+]%C_RESET% Discord terminated successfully.
+        echo [+] Discord terminated successfully.
     ) else (
-        echo %C_ERR%[x]%C_RESET% Could not terminate Discord. Close it manually and try again.
+        echo [x] Could not terminate Discord. Close it manually and try again.
         set "EXITCODE=1"
         goto :END
     )
@@ -146,27 +135,27 @@ echo.
 :: =========================================================
 :: Copy into Discord folder
 :: =========================================================
-echo %C_INFO%[*]%C_RESET% Copying files...
+echo [*] Copying files...
 echo.
 
 copy /y "%DLL_PATH%" "%TARGET_DIR%\%DLL_NAME%" >nul
 if errorlevel 1 (
-  echo %C_ERR%[x]%C_RESET% Failed to copy %DLL_NAME%.
+  echo [x] Failed to copy %DLL_NAME%.
   set "EXITCODE=1"
   goto :END
 )
-echo %C_OK%[+]%C_RESET% %DLL_NAME%
+echo [+] %DLL_NAME%
 
 copy /y "%INI_PATH%" "%TARGET_DIR%\%INI_NAME%" >nul
 if errorlevel 1 (
-  echo %C_ERR%[x]%C_RESET% Failed to copy %INI_NAME%.
+  echo [x] Failed to copy %INI_NAME%.
   set "EXITCODE=1"
   goto :END
 )
-echo %C_OK%[+]%C_RESET% %INI_NAME%
+echo [+] %INI_NAME%
 
 echo.
-echo %C_OK%[+]%C_RESET% Deployment complete. You can start Discord now.
+echo [+] Deployment complete. You can start Discord now.
 set "EXITCODE=0"
 goto :END
 
@@ -180,34 +169,34 @@ set "URL=%~1"
 set "OUT=%~2"
 set "LABEL=%~3"
 
-echo %C_INFO%[*]%C_RESET% %LABEL%
-echo   %C_DIM%%URL%%C_RESET%
+echo [*] %LABEL%
+echo     %URL%
 
 set "CURL_EXE=%SystemRoot%\System32\curl.exe"
 if not exist "%CURL_EXE%" (
-  echo %C_ERR%[x]%C_RESET% curl.exe not found in System32.
+  echo [x] curl.exe not found in System32.
   exit /b 1
 )
 
-"%CURL_EXE%" -L --fail --silent --show-error "%URL%" -o "%OUT%"
+"%CURL_EXE%" -L --fail --silent --show-error "%URL%" -o "%OUT%" 2>nul
 if errorlevel 1 (
-  echo %C_ERR%[x]%C_RESET% Download failed for %LABEL%.
+  echo [x] Download failed for %LABEL%.
   exit /b 1
 )
 
 if not exist "%OUT%" (
-  echo %C_ERR%[x]%C_RESET% File missing after download.
+  echo [x] File missing after download.
   exit /b 1
 )
 
 for %%F in ("%OUT%") do (
   if %%~zF LSS 1 (
-    echo %C_ERR%[x]%C_RESET% Downloaded file is empty.
+    echo [x] Downloaded file is empty.
     exit /b 1
   )
 )
 
-echo %C_OK%[+]%C_RESET% Downloaded.
+echo [+] Downloaded.
 echo.
 exit /b 0
 
@@ -237,6 +226,6 @@ endlocal & exit /b 0
 echo.
 if defined TEMP_DIR rd /s /q "%TEMP_DIR%" >nul 2>&1
 if not defined EXITCODE set "EXITCODE=1"
-echo %C_DIM%Press any key to close...%C_RESET%
+echo Press any key to close...
 pause >nul
 exit /b %EXITCODE%
